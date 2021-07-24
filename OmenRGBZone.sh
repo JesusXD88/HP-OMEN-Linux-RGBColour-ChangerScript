@@ -33,7 +33,6 @@ function main() {
     checker=true
     while [[ $checker != false ]]
     do
-        echo $checker
         echo -e "\nPlease select an option:\n\n"
         echo -e "1. Install RGB control driver (Kernel module)."
         echo -e "2. Change keyboard colour."
@@ -60,8 +59,29 @@ function main() {
         esac
 }
 
-function driverInstaller() {
 
+#Function that will clone the Kernel module's repository, build and install it.
+#Thanks to pelrun (https://github.com/pelrun/hp-omen-linux-module)
+
+function driverInstaller() {
+    clear
+    echo -e "The driver (Kernel module) will be installed, please wait...\n"
+    if [[ -d "hp-omen-linux-module" ]]
+    then
+        rm -rf hp-omen-linux-module
+    fi
+    git clone https://github.com/pelrun/hp-omen-linux-module.git
+    cd hp-omen-linux-module
+    make install
+    if [ $? -eq 0 ]
+    then
+        echo -e "\nThe driver has been built and installed succesfully!\nYou will need to reboot so the module can be loaded.\n"
+        sleep 3
+        main
+    else
+        echo -e "\nAn error has ocurred!\n"
+        main
+    fi
 }
 
 function zoneSelector() {
