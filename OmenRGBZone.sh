@@ -21,14 +21,57 @@
 
 # zone00 -> derecha | zone01 -> medio | zone02 -> izquierda | zone03 -> WASD
 
-clear
-echo -e "\nHP Omen RGB colour chooser by JesusXD88\n\n"
-echo -e "To use this script you need elevated privileges, as we're messing with system configs.\n"
-echo -e "\nPlease enter number of the RGB zone to change:\n\n"
-echo -e "1) Left zone\t\t(zone02)\n2) WASD\t\t\t(zone03)\n3) Mid zone\t\t(zone01)\n4) Right zone\t\t(zone00)" 
-echo -e "\n\n"
-read -p "=> " zona
-clear
+#Main function. This serves as an elevated privileges checker and as menu
+function main() {
+    clear
+    echo -e "\nHP Omen RGB colour chooser by JesusXD88\n\n"
+    if [[ "$EUID" != 0 ]]
+    then
+        echo -e "To use this script you need elevated privileges, as we're messing with system configs.\n"
+        exit 1
+    fi
+    checker=true
+    while [[ $checker != false ]]
+    do
+        echo $checker
+        echo -e "\nPlease select an option:\n\n"
+        echo -e "1. Install RGB control driver (Kernel module)."
+        echo -e "2. Change keyboard colour."
+        echo -e "3. Exit.\n"
+        read -p "=> " option
+        if  [[ "$option" =~ ^[1-3]+$ ]]
+        then
+            checker=false
+        fi
+    done
+
+    case "$option" in
+        "1")
+            driverInstaller
+            ;;
+        "2")
+            zoneSelector
+            ;;
+        "3")
+            echo -e "\nExiting...\n"
+            sleep 1
+            exit 0
+            ;;
+        esac
+}
+
+function driverInstaller() {
+
+}
+
+function zoneSelector() {
+    echo -e "\nPlease enter number of the RGB zone to change:\n\n"
+    echo -e "1) Left zone\t\t(zone02)\n2) WASD\t\t\t(zone03)\n3) Mid zone\t\t(zone01)\n4) Right zone\t\t(zone00)"
+    echo -e "\n\n"
+    read -p "=> " zona
+    zoneSwitchRecursivo
+    clear
+}
 
 function zoneSwitchRecursivo() {
 	case "$zona" in
@@ -56,7 +99,9 @@ function zoneSwitchRecursivo() {
 	esac
 }	
 
-zoneSwitchRecursivo
+
+
+main
 
 echo -e "\n\nPlease input the RGB zone colour you want to change (like this: 0000ff):\n\n"
 read -p "=> " colorRGB
