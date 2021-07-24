@@ -84,52 +84,113 @@ function driverInstaller() {
     fi
 }
 
+#Functions that is used as a RGB zone selector
+
 function zoneSelector() {
     echo -e "\nPlease enter number of the RGB zone to change:\n\n"
     echo -e "1) Left zone\t\t(zone02)\n2) WASD\t\t\t(zone03)\n3) Mid zone\t\t(zone01)\n4) Right zone\t\t(zone00)"
     echo -e "\n\n"
     read -p "=> " zona
-    zoneSwitchRecursivo
+    zoneSwitchRecursive
     clear
 }
 
-function zoneSwitchRecursivo() {
+#Function that will stablish the RGB zone
+
+function zoneSwitchRecursive() {
 	case "$zona" in
 		"1")
 			zone="zone02"
+			clear
 			echo -e "\nYou selected Left zone\n\n"
+			colourInputChooser
 			;;
 		"2")
 			zone="zone03"
+			clear
 			echo -e "\nYou selected WASD zone\n\n"
+			colourInputChooser
 			;;
 		"3")	
 			zone="zone01"
+			clear
 			echo -e "\nYou selected Mid zone\n\n"
+			colourInputChooser
 			;;
 		"4")
 			zone="zone00"
+			clear
 			echo -e "\nYou selected Right zone\n\n"
+			colourInputChooser
 			;;
 		*)
 			echo -e "\n\nPlease input a valid number:\n\n"
 			read -p "=> " zona
-			zoneSwitchRecursivo
+			zoneSwitchRecursive
 			;;
 	esac
+
 }	
 
+function colourInputChooser() {
+    checker=true
+    while [[ $checker != false ]]
+    do
+        echo -e "Choose the way the colour will be entered:\n"
+        echo -e "1. Choose colour from built-in presets.\n"
+        echo -e "2. Choose colour manually by hex code input.\n"
+        echo -e "3. Go back to main menu.\n"
+        read -p "=> " option
+        if  [[ "$option" =~ ^[1-3]+$ ]]
+        then
+            checker=false
+        fi
+    done
 
+    case "$option" in
+        "1")
+            echo "e"
+            colourChangerPresets
+            ;;
+        "2")
+            colourChangerManually
+            ;;
+        "3")
+            main
+            ;;
+    esac
+}
 
-main
+function colourChangerPresets() {
+    echo -e "Choose the built-in colour you want to choose:\n"
+    echo -e "1. Red.\n"
+    echo -e "2. Blue.\n"
+    echo -e "3. \033[0;32mGreen.\n"
+    echo -e "4. Purple.\n"
+    echo -e "5. Yellow.\n"
+    echo -e "6. Orange.\n"
+    echo -e "7. White.\n"
+    echo -e "8. Go back.\n"
+}
 
-echo -e "\n\nPlease input the RGB zone colour you want to change (like this: 0000ff):\n\n"
-read -p "=> " colorRGB
-clear
+#Function that will let you to manually enter the desired colour
 
-echo -e "\nChanging RGB colour, please wait..."
-sleep 1
-sudo bash -c " echo '$colorRGB' > /sys/devices/platform/hp-wmi/rgb_zones/$zone"
-sleep 1
-echo -e "\n\nColour changed succesfully!\n\nBye!"
+function colourChangerManually() {
+    echo -e "\n\nPlease input the RGB zone colour you want to change (like this: 0000ff):\n\n"
+    read -p "=> " colorRGB
+    clear
+    colourChanger
+}
 
+#Function that will change the colour on the desired zone by writing the colour in hex code to the zone file
+
+function colourChanger() {
+    echo -e "\nChanging RGB colour, please wait..."
+    sleep 1
+    sudo bash -c " echo '$colorRGB' > /sys/devices/platform/hp-wmi/rgb_zones/$zone"
+    sleep 1
+    echo -e "\n\nColour changed succesfully!\n"
+    main
+}
+
+main #Call to main
